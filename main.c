@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #define WIDTH 64
-#define HEIGHT 64
+#define HEIGHT 32
 
 typedef enum {
 	BACK = 0,
@@ -44,9 +44,9 @@ void show(void)
 	}
 }
 
-void circle(t_v2i center, int radius)
+void circle(t_v2f center, float radius)
 {
-	int r = radius;
+	float r = radius;
 	// NOTE: with bounding box
 	//
 	// t_v2i begin = v2i_sub(center, v2i_build(r, r));
@@ -65,14 +65,19 @@ void circle(t_v2i center, int radius)
 	{
 		for (int x = 0; x < WIDTH; x++)
 		{
-			t_v2i diff = v2i_sub(center, v2i_build(x, y));
-			if (v2i_sqlen(diff) < r*r)
+			t_v2f diff = v2f_sub(center, v2f_build(x, y));
+			if (v2f_sqlen(diff) < r*r)
 				display[y*WIDTH + x] = FORE;
 		}
 	}
 }
 
-#define FPS 2
+#define RADIUS (HEIGHT/4.0f)
+#define FPS 15
+#define GRAVITY 100.0f
+#define DT (1.0f/FPS)
+#define FRIC -0.8f
+
 void back(void)
 {
 	printf("\x1b[%dD", WIDTH);
@@ -81,14 +86,20 @@ void back(void)
 
 int main(void)
 {
-	t_v2i pos = v2i_build(WIDTH/2, HEIGHT/2);
-	t_v2i velocity = v2i_build(0, 5);
-	
-	while (1)
+	t_v2f pos = v2f_build(RADIUS, RADIUS);
+	t_v2f velocity = v2f_build(20.0f, 0.0f);
+	t_v2f gravity = v2f_build(0.0f, GRAVITY);
+	while (pos.c[X] < WIDTH + RADIUS)
 	{
-		pos = v2i_sum(pos, velocity);
+		velocity = v2f_sum(velocity, v2f_mul(gravity, v2f_build(DT, DT)));
+		pos = v2f_sum(pos, v2f_mul(velocity, v2f_build(DT, DT)));
+		if (pos.c[Y] > HEIGHT - RADIUS)
+		{
+			pos.c[Y] = HEIGHT - RADIUS;
+			velocity.c[Y] *= FRIC;
+		}
 		fill(BACK);
-		circle(pos, 13);
+		circle(pos, RADIUS);
 		show();
 		back();
 		usleep(1000*1000/FPS);
