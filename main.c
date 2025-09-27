@@ -73,7 +73,7 @@ void circle(t_v2f center, float radius)
 }
 
 #define RADIUS (HEIGHT/4.0f)
-#define FPS 15
+#define FPS 30
 #define GRAVITY 100.0f
 #define DT (1.0f/FPS)
 #define FRIC -0.8f
@@ -88,10 +88,9 @@ int main(void)
 {
 	t_v2f pos = v2f_build(RADIUS, RADIUS);
 	t_v2f velocity = v2f_build(20.0f, 0.0f);
-	t_v2f gravity = v2f_build(0.0f, GRAVITY);
 	while (pos.c[X] < WIDTH + RADIUS)
 	{
-		velocity = v2f_sum(velocity, v2f_mul(gravity, v2f_build(DT, DT)));
+		velocity = v2f_sum(velocity, v2f_build(0, GRAVITY*DT));
 		pos = v2f_sum(pos, v2f_mul(velocity, v2f_build(DT, DT)));
 		if (pos.c[Y] > HEIGHT - RADIUS)
 		{
