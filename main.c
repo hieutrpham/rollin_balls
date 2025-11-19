@@ -27,17 +27,14 @@ void fill(t_pixel c)
 void show(void)
 {
 	static char row[WIDTH];
-	static char table[PIXEL_N][PIXEL_N] = {
-		{' ', '_'},
-		{'^', '$'},
-	};
+	static char *table = " _^$";
 	for (int y = 0; y < HEIGHT/2; y++)
 	{
 		for (int x = 0; x < WIDTH; x++)
 		{
 			t_pixel top = display[2*y*WIDTH + x];
 			t_pixel bot = display[(2*y+1)*WIDTH + x];
-			row[x] = table[top][bot];
+			row[x] = table[top*2 + bot];
 		}
 		fwrite(row, WIDTH, 1, stdout);
 		fputc('\n', stdout);
@@ -87,7 +84,7 @@ void back(void)
 int main(void)
 {
 	t_v2f pos = v2f_build(RADIUS, RADIUS);
-	t_v2f velocity = v2f_build(20.0f, 0.0f);
+	t_v2f velocity = v2f_build(15.0f, 0.0f);
 	while (pos.c[X] < WIDTH + RADIUS)
 	{
 		velocity = v2f_sum(velocity, v2f_build(0, GRAVITY*DT));
